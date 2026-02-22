@@ -92,4 +92,25 @@ let search=async(req,res)=>{
     }
 }
 
-module.exports={addprod,upload,getallprods,getprod,updimg,updprod,delprod,search}
+
+let getProductByCat=async(req,res)=>{
+    try{
+        let data= await Product.find({"cat":req.params.cat})
+        res.json(data)
+
+
+    }catch{
+        res.json({"msg":"Error in loading product"})
+    }
+}
+
+let addComment=async(req,res)=>{
+    try{
+        await Product.findByIdAndUpdate({"_id":req.body._id},{$push:{"comm":req.body}})
+        res.json({"msg":"Comment added"})
+    }catch{
+        res.json({"msg":"Error in adding comment"})
+
+    }
+}
+module.exports={addprod,upload,getallprods,getprod,updimg,updprod,delprod,search,getProductByCat,addComment}

@@ -1,6 +1,7 @@
-import axios from "axios";
 import React, { useState } from "react";
 import api from "../config/baseUrl";
+
+
 function AddProduct() {
   const [data, setData] = useState({
     title: "",
@@ -8,156 +9,104 @@ function AddProduct() {
     desc: "",
     cat: "",
   });
-  let [img,setImg]=useState(null)
 
+  const [img, setImg] = useState(null);
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fun = (e) => {
-    setData({
-      ...data,
-      [e.target.name]: e.target.value,
-    });
+    setData({ ...data, [e.target.name]: e.target.value });
   };
 
   const fun1 = (e) => {
-    setImg( e.target.files[0]);
+    setImg(e.target.files[0]);
   };
 
   const handleSubmit = () => {
-    let fd = new FormData();
-    for (let p in data) {
-      fd.append(p, data[p]);
+    if (!img) {
+      setMsg("Please select an image");
+      return;
     }
-      fd.append("img", img);
 
-    api.post("/addprod", fd)
-      .then((res) => setMsg(res.data.msg))
-      .catch((err) => console.error(err));
-    setData({
-      title: "",
-      price: "",
-      desc: "",
-      cat: "",
-    });
-    setImg(null)
+    setLoading(true);
+    setMsg("");
+
+    const fd = new FormData();
+    for (let key in data) {
+      fd.append(key, data[key]);
+    }
+    fd.append("img", img);
+
+    api
+      .post("/addprod", fd)
+      .then((res) => {
+        setMsg(res.data.msg);
+        setData({ title: "", price: "", desc: "", cat: "" });
+        setImg(null);
+      })
+      .catch(() => setMsg("Something went wrong"))
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h2 style={styles.heading}>Add Product</h2>
+    <div className="addprod-page">
+      <div className="addprod-card">
+        <h2 className="addprod-title">Add Product</h2>
 
         <input
-          style={styles.input}
+          className="addprod-input"
           type="text"
-          placeholder="Enter title"
           name="title"
-          onChange={fun}
+          placeholder="Product Title"
           value={data.title}
-        />
-        <input
-          style={styles.input}
-          type="text"
           onChange={fun}
-          value={data.cat}
-          name="cat"
-          placeholder="Enter cat"
         />
 
         <input
-          style={styles.input}
+          className="addprod-input"
           type="text"
-          placeholder="Enter price"
-          name="price"
+          name="cat"
+          placeholder="Category"
+          value={data.cat}
           onChange={fun}
+        />
+
+        <input
+          className="addprod-input"
+          type="text"
+          name="price"
+          placeholder="Price"
           value={data.price}
+          onChange={fun}
         />
 
         <textarea
-          style={styles.textarea}
-          placeholder="Enter description"
+          className="addprod-textarea"
           name="desc"
-          onChange={fun}
+          placeholder="Product Description"
           value={data.desc}
+          onChange={fun}
         />
 
         <input
-          style={styles.file}
+          className="addprod-file"
           type="file"
           accept=".jpg,.jpeg,.png"
           onChange={fun1}
-        
         />
-        
 
-        <button style={styles.button} onClick={handleSubmit}>
-          Add Product
+        <button
+          className="addprod-btn"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? "Uploading..." : "Add Product"}
         </button>
 
-        {msg && <p style={styles.msg}>{msg}</p>}
+        {msg && <p className="addprod-msg">{msg}</p>}
       </div>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(135deg, #1f1c2c, #928dab)",
-  },
-  card: {
-    width: "360px",
-    padding: "25px",
-    borderRadius: "12px",
-    background: "rgba(255,255,255,0.12)",
-    backdropFilter: "blur(10px)",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
-  },
-  heading: {
-    textAlign: "center",
-    color: "#fff",
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "12px",
-    borderRadius: "6px",
-    border: "none",
-    outline: "none",
-  },
-  textarea: {
-    width: "100%",
-    padding: "10px",
-    height: "70px",
-    marginBottom: "12px",
-    borderRadius: "6px",
-    border: "none",
-    outline: "none",
-    resize: "none",
-  },
-  file: {
-    color: "#fff",
-    marginBottom: "15px",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "6px",
-    border: "none",
-    cursor: "pointer",
-    background: "#ff9800",
-    color: "#000",
-    fontWeight: "bold",
-  },
-  msg: {
-    marginTop: "12px",
-    textAlign: "center",
-    color: "#00ff99",
-  },
-};
 
 export default AddProduct;

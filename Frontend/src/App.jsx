@@ -13,6 +13,9 @@ import Computers from './Components/Computers'
 import Gadgets from './Components/Gadgets'
 import Others from './Components/Others'
 import AddProduct from './Components/AddProduct'
+import Cart from './Components/Cart'
+import Knowmore from './Components/Knowmore'
+
 
 function App() {
   let [state,setState]=useState({"token":"","name":"","uid":"","role":""})
@@ -47,6 +50,9 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/reg' element={<Register/>}/>
       <Route path='/logout' element={<Logout/>}/>
+      <Route path='/cart' element={<Cart/>}/>
+      <Route path='/km/:pid' element={<Knowmore/>}/>
+      
 
       <Route/>
     </Routes>
